@@ -1,0 +1,9 @@
+spring:
+  main:
+    web-application-type: none
+
+bot:
+  command-identifier: '~'
+
+discord:
+  token: 
