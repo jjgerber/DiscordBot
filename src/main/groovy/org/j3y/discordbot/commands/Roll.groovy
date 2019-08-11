@@ -4,11 +4,16 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import org.springframework.stereotype.Component
 
 @Component
-class Roll implements Command {
+class Roll extends Command {
 
     @Override
     String getCommandKey() {
         return "roll"
+    }
+
+    @Override
+    boolean isAdminCommand() {
+        return false
     }
 
     @Override

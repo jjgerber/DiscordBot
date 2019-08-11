@@ -2,8 +2,20 @@ spring:
   main:
     web-application-type: none
 
+  datasource:
+    url: jdbc:h2:file:~/data/discordbot
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+
 bot:
   command-identifier: '~'
+  admins:
+    - Jeyrad#4441
 
 discord:
-  token: 
+  token:

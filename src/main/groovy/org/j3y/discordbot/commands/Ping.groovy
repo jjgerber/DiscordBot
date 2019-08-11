@@ -4,11 +4,16 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import org.springframework.stereotype.Component
 
 @Component
-class Ping implements Command {
+class Ping extends Command {
 
     @Override
     String getCommandKey() {
         return "ping"
+    }
+
+    @Override
+    boolean isAdminCommand() {
+        return false
     }
 
     @Override

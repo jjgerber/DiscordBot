@@ -11,23 +11,22 @@ import org.springframework.web.util.UriComponentsBuilder
 
 @Component
 @Slf4j
-class OsrsStats implements Command {
+class OsrsStats extends Command {
 
-    RestTemplate client
-    ObjectMapper mapper
+    RestTemplate client = new RestTemplate()
 
     List skills = ['Overall', 'Attack', 'Defence', 'Strength', 'HP', 'Ranged' , 'Prayer', 'Magic', 'Cooking',
                    'Woodcutting', 'Fletching', 'Fishing' , 'Firemaking', 'Crafting', 'Smithing', 'Mining',
                    'Herblore', 'Agility', 'Thieving', 'Slayer', 'Farming', 'Runecrafting', 'Hunter', 'Construction']
 
-    OsrsStats() {
-        client = new RestTemplate()
-        mapper = new ObjectMapper()
-    }
-
     @Override
     String getCommandKey() {
         return "osrs"
+    }
+
+    @Override
+    boolean isAdminCommand() {
+        return false
     }
 
     @Override

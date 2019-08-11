@@ -8,19 +8,19 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 
 @Component
-class GuildRank implements Command {
+class GuildRank extends Command {
 
-    RestTemplate client
-    ObjectMapper mapper
-
-    GuildRank() {
-        client = new RestTemplate()
-        mapper = new ObjectMapper()
-    }
+    RestTemplate client = new RestTemplate()
+    ObjectMapper mapper = new ObjectMapper()
 
     @Override
     String getCommandKey() {
         return "guildrank"
+    }
+
+    @Override
+    boolean isAdminCommand() {
+        return false
     }
 
     @Override
