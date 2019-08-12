@@ -26,12 +26,12 @@ class ListCommands extends Command {
     void execute(MessageReceivedEvent event, String... tokens) {
         String message = "Available Commands: "
         allCommands.eachWithIndex { cmd, idx ->
-            message += cmd.getCommandKey()
+            message += "${prefix}${cmd.getCommandKey()}"
             if (idx < allCommands.size() - 1)
                 message += ', '
         }
 
-        event.getChannel().sendMessage(message).queue()
+        sendMessage(event.getChannel(), message)
     }
 
 }

@@ -1,6 +1,7 @@
 package org.j3y.discordbot.commands
 
 import groovy.util.logging.Slf4j
+import net.dv8tion.jda.api.entities.MessageChannel
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
@@ -11,21 +12,25 @@ import org.springframework.beans.factory.annotation.Value
 import javax.annotation.Nonnull
 
 @Slf4j
-abstract class Command extends ListenerAdapter {
+class Command extends ListenerAdapter {
 
-    String commandIdentifier
-    UserService userService
+    @Value('${bot.command-prefix:@}')
+    String prefix
 
     @Autowired
-    CommandListener(@Value('${bot.command-identifier:@}') String commandIdentifier,
-                    UserService userService) {
-        this.commandIdentifier = commandIdentifier
-        this.userService = userService
+    UserService userService
+
+    String getCommandKey() {
+        return null
     }
 
-    abstract String getCommandKey()
-    abstract boolean isAdminCommand()
-    abstract void execute(MessageReceivedEvent messageEvent, String... tokens)
+    boolean isAdminCommand() {
+        return false
+    }
+
+    void execute(MessageReceivedEvent messageEvent, String... tokens) {
+
+    }
 
     @Override
     void onMessageReceived(@Nonnull MessageReceivedEvent event) {
@@ -37,22 +42,25 @@ abstract class Command extends ListenerAdapter {
         String[] tokens = event.getMessage().getContentRaw().split()
         String inputCommand = tokens[0]
 
-        if ("${commandIdentifier}${getCommandKey()}" == inputCommand) {
+        if ("${prefix}${getCommandKey()}" == inputCommand) {
             log.info "Received command: {}", inputCommand
             String authorTag = author.getAsTag()
 
             if (userService.isUserBlocked(authorTag)) {
-                event.getChannel().sendMessage("Sorry, " + author.getName() +", you are blocked from using the bot.").queue()
+                sendMessage(event.getChannel(), "Sorry, ${author.getName()}, you are blocked from using the bot.")
                 return
             }
 
             if (isAdminCommand() && !userService.isUserAdmin(authorTag)) {
-                event.getChannel().sendMessage("This command requires admin permissions.").queue()
+                sendMessage(event.getChannel(), "This command requires admin permissions.")
                 return
             }
 
             this.execute(event, tokens)
         }
+    }
 
+    static void sendMessage(MessageChannel channel, String message) {
+        channel.sendMessage(message).queue()
     }
 }

@@ -1,7 +1,6 @@
 package org.j3y.discordbot.commands
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
+
 import groovy.util.logging.Slf4j
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import org.springframework.stereotype.Component
@@ -32,22 +31,22 @@ class OsrsStats extends Command {
     @Override
     void execute(MessageReceivedEvent event, String... tokens) {
         if (tokens.size() < 2) {
-            event.getChannel().sendMessage("Invalid arguments. Format: `!osrs [player]`").queue()
+            sendMessage(event.getChannel(), "Invalid arguments. Format: `${prefix}osrs [player]`")
             return
         }
 
         String player = tokens.drop(1).join('+')
 
         URI url = UriComponentsBuilder
-                .fromHttpUrl("https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player={player}")
-                .buildAndExpand(player)
-                .toUri()
+                .fromHttpUrl("https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws")
+                .queryParam("player", player)
+                .build().toUri()
 
         String response
         try {
              response = client.getForObject(url, String.class)
         } catch (HttpStatusCodeException hsce) {
-            event.getChannel().sendMessage("That player's high scores were not found.").queue()
+            sendMessage(event.getChannel(), "That player's high scores were not found.")
             return
         }
 
@@ -64,7 +63,7 @@ class OsrsStats extends Command {
 
         botResponse += '\n```'
 
-        event.getChannel().sendMessage(botResponse).queue()
+        sendMessage(event.getChannel(), botResponse)
     }
 
 }

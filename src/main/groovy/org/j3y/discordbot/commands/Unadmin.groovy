@@ -24,7 +24,7 @@ class Unadmin extends Command {
     @Transactional
     void execute(MessageReceivedEvent event, String... tokens) {
         if (tokens.size() != 2) {
-            event.getChannel().sendMessage("Invalid arguments. Format: `!unadmin [userId]`").queue()
+            sendMessage(event.getChannel(), "Invalid arguments. Format: `${prefix}unadmin [userId]`")
             return
         }
 
@@ -32,9 +32,9 @@ class Unadmin extends Command {
 
         try {
             userService.setUserAdmin(userId, false)
-            event.getChannel().sendMessage("User `" + userId + "` was removed as an Admin.").queue()
+            sendMessage(event.getChannel(), "User `${userId}` was removed as an Admin.")
         } catch (IllegalArgumentException iae) {
-            event.getChannel().sendMessage(iae.getMessage()).queue()
+            sendMessage(event.getChannel(), iae.getMessage())
         }
 
     }

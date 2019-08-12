@@ -25,7 +25,7 @@ class Block extends Command {
     @Transactional
     void execute(MessageReceivedEvent event, String... tokens) {
         if (tokens.size() != 2) {
-            event.getChannel().sendMessage("Invalid arguments. Format: `!block [userId]`").queue()
+            sendMessage(event.getChannel(), "Invalid arguments. Format: `${prefix}block [userId]`")
             return
         }
 
@@ -33,7 +33,7 @@ class Block extends Command {
 
         try {
             userService.setUserBlocked(userId, true)
-            event.getChannel().sendMessage("User `" + userId + "` was blocked.").queue()
+            sendMessage(event.getChannel(), "User `${userId}` was blocked.")
         } catch (IllegalArgumentException iae) {
             event.getChannel().sendMessage(iae.getMessage()).queue()
         }

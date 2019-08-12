@@ -26,7 +26,7 @@ class GuildRank extends Command {
     @Override
     void execute(MessageReceivedEvent event, String... tokens) {
         if (tokens.size() < 3) {
-            event.getChannel().sendMessage("Invalid arguments. Format: `!guildrank [server] [guildname]`").queue()
+            sendMessage(event.getChannel(),"Invalid arguments. Format: `${prefix}guildrank [server] [guildname]`")
             return
         }
 
@@ -34,7 +34,7 @@ class GuildRank extends Command {
         String guild = tokens.drop(2).join('+')
 
         URI url = UriComponentsBuilder
-                .fromHttpUrl("https://www.wowprogress.com/guild/us/{realm}/{guild}/json_rank")
+                .fromHttpUrl("https://www.wowprogress.com/guild/us/{server}/{guild}/json_rank")
                 .buildAndExpand(server, guild)
                 .toUri()
 
@@ -47,7 +47,7 @@ class GuildRank extends Command {
 
         String botResponse = "**Realm Rank:** `${realmRank}`\n**US Rank:** `${areaRank}`\n**World Rank:** `${worldRank}`"
 
-        event.getChannel().sendMessage(botResponse).queue()
+        sendMessage(event.getChannel(), botResponse)
     }
 
 }

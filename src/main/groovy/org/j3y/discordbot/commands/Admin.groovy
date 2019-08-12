@@ -24,7 +24,7 @@ class Admin extends Command {
     @Transactional
     void execute(MessageReceivedEvent event, String... tokens) {
         if (tokens.size() != 2) {
-            event.getChannel().sendMessage("Invalid arguments. Format: `!admin [userId]`").queue()
+            sendMessage(event.getChannel(), "Invalid arguments. Format: `${prefix}admin [userId]`")
             return
         }
 
@@ -32,7 +32,7 @@ class Admin extends Command {
 
         try {
             userService.setUserAdmin(userId, true)
-            event.getChannel().sendMessage("User `" + userId + "` was set as an Admin.").queue()
+            sendMessage(event.getChannel(), "User `${userId}` was set as an Admin.")
         } catch (IllegalArgumentException iae) {
             event.getChannel().sendMessage(iae.getMessage()).queue()
         }

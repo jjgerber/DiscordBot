@@ -15,12 +15,13 @@ class DefaultAdminListener extends ListenerAdapter {
 
     @Autowired
     UserService userService
+
     @Autowired
     List<String> defaultAdmins
 
     @Override
     void onReady(@Nonnull ReadyEvent event) {
-        log.info("Default Admins: {}", defaultAdmins)
+        log.info("Setting Default Admins: {}", defaultAdmins.join(','))
         defaultAdmins.each {
             try {
                 userService.setUserAdmin(it, true)

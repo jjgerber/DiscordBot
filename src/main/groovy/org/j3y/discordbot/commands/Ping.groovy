@@ -18,7 +18,7 @@ class Ping extends Command {
 
     @Override
     void execute(MessageReceivedEvent event, String... tokens) {
-        event.getChannel().sendMessage(event.getAuthor().getName() + " - Pong!").queue()
+        sendMessage(event.getChannel(), "${event.getAuthor().getName()} - Pong!")
     }
 
 }
