@@ -1,4 +1,5 @@
 plugins {
+	id 'com.gradle.build-scan' version '2.1'
 	id 'org.springframework.boot' version '2.1.7.RELEASE'
 	id 'groovy'
 }
@@ -15,8 +16,8 @@ repositories {
 }
 
 buildScan {
-	licenseAgreementUrl = "https://gradle.com/terms-of-service"
-	licenseAgree = "yes"
+	termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+	termsOfServiceAgree = 'yes'
 }
 
 dependencies {
