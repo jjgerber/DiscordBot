@@ -1,4 +1,4 @@
-language: java
+language: groovy
 install: true
 
 os: linux
@@ -6,7 +6,7 @@ dist: trusty
 jdk: oraclejdk12
 
 script:
-  - ./gradlew build --scan -s
+  - ./gradlew clean check bootJar --scan -s
 
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
