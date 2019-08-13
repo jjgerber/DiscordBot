@@ -4,6 +4,8 @@ os: linux
 dist: xenial
 jdk: oraclejdk12
 
+if: branch = master
+
 script:
   - "./gradlew clean check bootJar --scan -s"
 
