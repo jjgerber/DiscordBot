@@ -19,7 +19,7 @@ cache:
 deploy:
   provider: releases
   api_key:
-    secure: JvgY/FD/QzfIzQFyNjr1o2I7EeQDnTzXE4cDa1YoHg35gx0uQnCVWRNELrMswCGyOk3Rxt3OdC0rpuJbLpfd5lSKrmC3q+51IlMR2dRb+oEULs8HoXaJRPWvM+OWcv+NRTdX4miMDSmxAhGS0rv5511eJ0YFFDErFCcoLm2WVkQyiTRTvQBTID/X7h1twy7RqF4XAzBD8g06qvhmElO4Nk82ERsv5wQUF00SNTiVSNPL4J50MXR4UOvwm0h6YhSPoaijq016aum8mDccNK4OVSZcAmR1RgFpMGAxZRu5YZ5/TFo2kkm4flsQ/lPTvz3EbPwKklPpErumfzWpM9B0CC+R2ED8Qzs6LFMJ1W4G4mVjKPgBpbNA3b5P32isV1Oh3YcuTqD09TSATGOPsreArIppgBTj1cIDZPMV8/mquO933XvUoUHG/366sp1IlISgAb6KgJ8zA36Lee+BH19TPjVCHl2CBLgpMZzXixcaIw0seE0khcgUO52B+6QdAJUL9Rs32EZ8ZecNdFr5n6Pf7jqozPa8nk4TZP1rrZCCzjXDJA77BqfI/ZoZhBC73xtbgJgDt04e5ZjRga90vSJRGvpZ77BbIdjI13+Flx1ICBWV+VwMDHlaLNkQ6ItLbriQIXX0WRZxXp0wpxoKQJfkUP2GasJPX1WyuHw0iRODKgg=
+    secure: "${GITHUB_KEY}"
   file: "build/libs/discordbot*.jar"
   skip_cleanup: true
   file_glob: true
