@@ -2,7 +2,7 @@ language: groovy
 install: true
 
 os: linux
-dist: trusty
+dist: xenial
 jdk: oraclejdk12
 
 script:
