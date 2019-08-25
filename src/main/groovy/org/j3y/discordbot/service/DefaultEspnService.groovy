@@ -21,7 +21,8 @@ class DefaultEspnService implements EspnService {
 
     RestTemplate client = new RestTemplate()
 
-    DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern('MM/dd hh:mm a z')
+    DateTimeFormatter FORMATTER_DATE = DateTimeFormatter.ofPattern('MM/dd')
+    DateTimeFormatter FORMATTER_TIME = DateTimeFormatter.ofPattern('hh:mm a z')
 
     @Override
     @Cacheable("cfbScoreboards")
@@ -73,7 +74,9 @@ class DefaultEspnService implements EspnService {
             ZonedDateTime date = ZonedDateTime.parse(dateStr).withZoneSameInstant(ZoneOffset.UTC)
             date = date.withZoneSameInstant(ZoneId.of("America/Chicago"))
 
-            String eventDay = date.getDayOfWeek().toString()
+            // Add 1 (go to EST timezone) when checking what day the event is cause ESPN gives
+            // TBD events a date of midnight EST
+            String eventDay = date.plusHours(1).getDayOfWeek().toString()
             if (!currentDay.equals(eventDay)) {
                 if (currentDay != '')
                     sb.append "\n"
@@ -84,7 +87,7 @@ class DefaultEspnService implements EspnService {
 
             JsonNode competition = event.path("competitions").path(0)
             String network = competition.path("broadcasts").path(0)
-                    .path("names").path(0).asText("TBA")
+                    .path("names").path(0).asText("TBD")
 
             JsonNode away = competition.path("competitors").path(1)
             String awayTeam = away.path("team").path("abbreviation").asText()
@@ -93,7 +96,7 @@ class DefaultEspnService implements EspnService {
             if (isAwayWinner)
                 awayTeam = "${awayTeam}*"
             if (awayRank <= 25)
-                awayTeam = "(${awayRank}) ${awayTeam}"
+                awayTeam = "${awayRank} ${awayTeam}"
 
             JsonNode home = competition.path("competitors").path(0)
             String homeTeam = home.path("team").path("abbreviation").asText()
@@ -102,19 +105,23 @@ class DefaultEspnService implements EspnService {
             if (isHomeWinner)
                 homeTeam = "*${homeTeam}"
             if (homeRank <= 25)
-                homeTeam = "${homeTeam} (${homeRank})"
+                homeTeam = "${homeTeam} ${homeRank}"
 
-            sb.append String.format('\n%-8s%12s @ %-12s%15s', "[${network}]", awayTeam, homeTeam, date.format(FORMATTER))
-
+            String eventDate = date.format(FORMATTER_DATE)
+            String status = "TBD"
             if (period > 0) {
                 // Game is running -> Get scores.
                 JsonNode competitors = event.path("competitions").path(0).path("competitors")
                 String homeScore = competitors.path(0).path("score").asText()
                 String awayScore = competitors.path(1).path("score").asText()
-                String status = event.path("status").path("type").path("shortDetail").asText()
+                String statusTxt = event.path("status").path("type").path("shortDetail").asText()
 
-                sb.append String.format('%14s%5s-%-10s', "[${status}]", awayScore, homeScore)
+                status = String.format('%12s%5s-%-10s', statusTxt, awayScore, homeScore)
+            } else if (date.plusHours(1).getHour() != 0) {
+                status = date.format(FORMATTER_TIME)
             }
+
+            sb.append String.format('\n%-8s%10s @ %-10s%8s %-7s', "[${network}]", awayTeam, homeTeam, eventDate, status)
         }
 
         sb.append "\n```"
