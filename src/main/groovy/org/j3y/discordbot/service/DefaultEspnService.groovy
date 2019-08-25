@@ -67,13 +67,34 @@ class DefaultEspnService implements EspnService {
         StringBuilder sb = new StringBuilder("```prolog")
 
         events.each { event ->
-            String name = event.path("shortName").asText()
             String dateStr = event.path("date").asText()
             int period = event.path("status").path("period").asInt()
             ZonedDateTime date = ZonedDateTime.parse(dateStr).withZoneSameInstant(ZoneOffset.UTC)
             date = date.withZoneSameInstant(ZoneId.of("America/Chicago"))
 
-            sb.append String.format('\n%-20s%s', name, date.format(FORMATTER))
+            JsonNode competition = event.path("competitions").path(0)
+            String network = competition.path("broadcasts").path(0)
+                    .path("names").path(0).asText("TBA")
+
+            JsonNode away = competition.path("competitors").path(1)
+            String awayTeam = away.path("team").path("abbreviation").asText()
+            boolean isAwayWinner = away.path("winner").asBoolean(false)
+            int awayRank = away.path("curatedRank").path("current").asInt(99)
+            if (isAwayWinner)
+                awayTeam = "${awayTeam}*"
+            if (awayRank <= 25)
+                awayTeam = "(${awayRank}) ${awayTeam}"
+
+            JsonNode home = competition.path("competitors").path(0)
+            String homeTeam = home.path("team").path("abbreviation").asText()
+            boolean isHomeWinner = home.path("winner").asBoolean(false)
+            int homeRank = home.path("curatedRank").path("current").asInt(99)
+            if (isHomeWinner)
+                homeTeam = "*${homeTeam}"
+            if (homeRank <= 25)
+                homeTeam = "${homeTeam} (${homeRank})"
+
+            sb.append String.format('\n%-8s%12s @ %-12s%15s', "[${network}]", awayTeam, homeTeam, date.format(FORMATTER))
 
             if (period > 0) {
                 // Game is running -> Get scores.
@@ -82,7 +103,7 @@ class DefaultEspnService implements EspnService {
                 String awayScore = competitors.path(1).path("score").asText()
                 String status = event.path("status").path("type").path("shortDetail").asText()
 
-                sb.append String.format('%18s%5s-%-10s', "[${status}]", awayScore, homeScore)
+                sb.append String.format('%14s%5s-%-10s', "[${status}]", awayScore, homeScore)
             }
         }
 
