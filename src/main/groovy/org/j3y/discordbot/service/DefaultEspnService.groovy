@@ -66,11 +66,21 @@ class DefaultEspnService implements EspnService {
 
         StringBuilder sb = new StringBuilder("```prolog")
 
+        String currentDay = ''
         events.each { event ->
             String dateStr = event.path("date").asText()
             int period = event.path("status").path("period").asInt()
             ZonedDateTime date = ZonedDateTime.parse(dateStr).withZoneSameInstant(ZoneOffset.UTC)
             date = date.withZoneSameInstant(ZoneId.of("America/Chicago"))
+
+            String eventDay = date.getDayOfWeek().toString()
+            if (!currentDay.equals(eventDay)) {
+                if (currentDay != '')
+                    sb.append "\n"
+                currentDay = eventDay
+                sb.append "\n${eventDay}"
+                sb.append '\n--------'
+            }
 
             JsonNode competition = event.path("competitions").path(0)
             String network = competition.path("broadcasts").path(0)
