@@ -22,7 +22,7 @@ class DefaultEspnService implements EspnService {
     RestTemplate client = new RestTemplate()
 
     DateTimeFormatter FORMATTER_DATE = DateTimeFormatter.ofPattern('MM/dd')
-    DateTimeFormatter FORMATTER_TIME = DateTimeFormatter.ofPattern('hh:mm a z')
+    DateTimeFormatter FORMATTER_TIME = DateTimeFormatter.ofPattern('h:mm a z')
 
     @Override
     @Cacheable("cfbScoreboards")
@@ -72,17 +72,18 @@ class DefaultEspnService implements EspnService {
             String dateStr = event.path("date").asText()
             int period = event.path("status").path("period").asInt()
             ZonedDateTime date = ZonedDateTime.parse(dateStr).withZoneSameInstant(ZoneOffset.UTC)
-            date = date.withZoneSameInstant(ZoneId.of("America/Chicago"))
+            date = date.withZoneSameInstant(ZoneId.of("America/New_York"))
+            ZonedDateTime centralDate = date.withZoneSameInstant(ZoneId.of("America/Chicago"))
 
             // Add 1 (go to EST timezone) when checking what day the event is cause ESPN gives
             // TBD events a date of midnight EST
-            String eventDay = date.plusHours(1).getDayOfWeek().toString()
+            String eventDay = date.getDayOfWeek().toString()
             if (!currentDay.equals(eventDay)) {
                 if (currentDay != '')
                     sb.append "\n"
                 currentDay = eventDay
-                sb.append "\n${eventDay}"
-                sb.append '\n--------'
+                sb.append "\n${eventDay} - ${date.format(FORMATTER_DATE)}"
+                sb.append '\n-------------------------------------------------'
             }
 
             JsonNode competition = event.path("competitions").path(0)
@@ -116,12 +117,12 @@ class DefaultEspnService implements EspnService {
                 String awayScore = competitors.path(1).path("score").asText()
                 String statusTxt = event.path("status").path("type").path("shortDetail").asText()
 
-                status = String.format('%12s%5s-%-10s', statusTxt, awayScore, homeScore)
-            } else if (date.plusHours(1).getHour() != 0) {
-                status = date.format(FORMATTER_TIME)
+                status = String.format('%3s-%-4s%-12s', awayScore, homeScore, statusTxt)
+            } else if (date.getHour() != 0) {
+                status = String.format('%12s', centralDate.format(FORMATTER_TIME))
             }
 
-            sb.append String.format('\n%-8s%10s @ %-10s%8s %-7s', "[${network}]", awayTeam, homeTeam, eventDate, status)
+            sb.append String.format('\n%-8s%10s @ %-10s %-7s', "[${network}]", awayTeam, homeTeam, status)
         }
 
         sb.append "\n```"
