@@ -19,7 +19,8 @@ class CacheConfig {
 
         simpleCacheManager.setCaches([
                 new ConcurrentMapCache("cfbScoreboards"),
-                new ConcurrentMapCache("nflScoreboards")
+                new ConcurrentMapCache("nflScoreboards"),
+                new ConcurrentMapCache("nhlScoreboards")
         ])
 
         return simpleCacheManager

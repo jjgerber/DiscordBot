@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -22,6 +23,7 @@ class DefaultEspnService implements EspnService {
     RestTemplate client = new RestTemplate()
 
     DateTimeFormatter FORMATTER_DATE = DateTimeFormatter.ofPattern('MM/dd')
+    DateTimeFormatter FORMATTER_NHL_DATE = DateTimeFormatter.ofPattern("yyyyMMdd")
     DateTimeFormatter FORMATTER_TIME = DateTimeFormatter.ofPattern('h:mm a z')
 
     @Override
@@ -51,7 +53,22 @@ class DefaultEspnService implements EspnService {
         return client.getForObject(espnUriBuilder.build().toUri(), JsonNode.class)
     }
 
-    @CacheEvict(value = ['cfbScoreboards', 'nflScoreboards'], allEntries = true)
+    @Override
+    @Cacheable("nhlScoreboards")
+    JsonNode getNhlScoreboard(int days) {
+        log.info "Updating NHL Cache."
+
+        LocalDate lookupDate = LocalDate.now().plusDays(days)
+        String dateQuery = lookupDate.format(FORMATTER_NHL_DATE)
+
+        UriComponentsBuilder espnUriBuilder = UriComponentsBuilder.fromHttpUrl('https://site.web.api.espn.com/apis/site/v2/' +
+                'sports/hockey/nhl/scoreboard?region=us&lang=en&limit=100&calendartype=blacklist')
+                .queryParam('dates', dateQuery)
+
+        return client.getForObject(espnUriBuilder.build().toUri(), JsonNode.class)
+    }
+
+    @CacheEvict(value = ['cfbScoreboards', 'nflScoreboards', 'nhlScoreboards'], allEntries = true)
     @Scheduled(fixedRate = 60000l)
     void evictCaches() {
         log.debug "Evicted ESPN caches."
